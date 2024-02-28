@@ -5,5 +5,7 @@ import org.lnu.teaching.web.application.dising.deanery.entity.faculty.FacultyEnt
 import java.util.List;
 
 public interface FacultyRepository {
+    FacultyEntity create(FacultyEntity facultyEntity);
     List<FacultyEntity> findAll();
+    FacultyEntity find(Long id);
 }

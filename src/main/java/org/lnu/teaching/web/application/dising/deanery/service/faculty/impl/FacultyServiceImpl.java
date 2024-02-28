@@ -1,6 +1,7 @@
 package org.lnu.teaching.web.application.dising.deanery.service.faculty.impl;
 
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.dto.faculty.BaseFacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.entity.faculty.FacultyEntity;
 import org.lnu.teaching.web.application.dising.deanery.mapper.FacultyMapper;
@@ -16,6 +17,13 @@ public class FacultyServiceImpl implements FacultyService {
     
     private final FacultyRepository facultyRepository;
     private final FacultyMapper facultyMapper;
+
+    @Override
+    public FacultyDto create(BaseFacultyDto facultyDto) {
+        FacultyEntity facultyEntity = facultyMapper.toEntity(facultyDto);
+        FacultyEntity createFacultyEntity = facultyRepository.create(facultyEntity);
+        return facultyMapper.toDto(createFacultyEntity);
+    }
     
     @Override
     public List<FacultyDto> findAll() {
@@ -25,9 +33,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public FacultyDto find(Long id) {
-        FacultyDto faculty = new FacultyDto();
-        faculty.setId(id);
-
-        return faculty;
+        FacultyEntity facultyEntity = facultyRepository.find(id);
+        return facultyMapper.toDto(facultyEntity);
     }
 }
