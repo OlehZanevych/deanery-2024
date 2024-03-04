@@ -1,6 +1,7 @@
 package org.lnu.teaching.web.application.dising.deanery.repository.faculty.impl;
 
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyPatch;
 import org.lnu.teaching.web.application.dising.deanery.exception.DataConflictException;
 import org.lnu.teaching.web.application.dising.deanery.exception.NotFoundException;
 import org.lnu.teaching.web.application.dising.deanery.entity.faculty.FacultyEntity;
@@ -15,6 +16,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -62,6 +64,27 @@ public class FacultyRepositoryImpl implements FacultyRepository {
                 info
             FROM faculties
             WHERE id = :id
+            """;
+
+    private static final String UPDATE_FACULTY_BY_ID_QUERY = """
+            UPDATE faculties SET
+                name = :name,
+                website = :website,
+                email = :email,
+                phone = :phone,
+                address = :address,
+                info = :info
+            WHERE id = :id
+            """;
+
+    private static final String PATCH_FACULTY_BY_ID_QUERY_TEMPLATE = """
+            UPDATE faculties SET
+                %s
+            WHERE id = :id
+            """;
+
+    private static final String DELETE_FACULTY_BY_ID_QUERY = """
+            DELETE FROM faculties WHERE id = :id
             """;
 
     private static final RowMapper<FacultyEntity> FACULTY_ROW_MAPPER = (rs, rowNum) -> {
@@ -119,6 +142,95 @@ public class FacultyRepositoryImpl implements FacultyRepository {
         try {
             return jdbcTemplate.queryForObject(SELECT_FACULTY_BY_ID_QUERY, new MapSqlParameterSource("id", id), FACULTY_ROW_MAPPER);
         } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Faculty with id " + id + " not found!");
+        }
+    }
+
+    @Override
+    public void update(FacultyEntity facultyEntity) {
+        int affectedRows;
+        try {
+            affectedRows = jdbcTemplate.update(UPDATE_FACULTY_BY_ID_QUERY, new MapSqlParameterSource()
+                    .addValue("id", facultyEntity.getId())
+                    .addValue("name", facultyEntity.getName())
+                    .addValue("website", facultyEntity.getWebsite())
+                    .addValue("email", facultyEntity.getEmail())
+                    .addValue("phone", facultyEntity.getPhone())
+                    .addValue("address", facultyEntity.getAddress())
+                    .addValue("info", facultyEntity.getInfo())
+            );
+        } catch (DuplicateKeyException e) {
+            if (e.getCause().getMessage().contains("duplicate key value violates unique constraint \"faculties_name_key\"")) {
+                throw new DataConflictException(String.format("Faculty with name \"%s\" already exists!", facultyEntity.getName()));
+            }
+
+            throw e;
+        }
+
+        if (affectedRows == 0) {
+            throw new NotFoundException("Faculty with id " + facultyEntity.getId() + " not found!");
+        }
+    }
+
+    @Override
+    public void patch(Long id, FacultyPatch facultyPatch) {
+        List<String> assignments = new ArrayList<>();
+        MapSqlParameterSource parameters = new MapSqlParameterSource("id", id);
+
+        if (facultyPatch.isNameUpdated()) {
+            assignments.add("name = :name");
+            parameters.addValue("name", facultyPatch.getName());
+        }
+
+        if (facultyPatch.isWebsiteUpdated()) {
+            assignments.add("website = :website");
+            parameters.addValue("website", facultyPatch.getWebsite());
+        }
+
+        if (facultyPatch.isEmailUpdated()) {
+            assignments.add("email = :email");
+            parameters.addValue("email", facultyPatch.getEmail());
+        }
+
+        if (facultyPatch.isPhoneUpdated()) {
+            assignments.add("phone = :phone");
+            parameters.addValue("phone", facultyPatch.getPhone());
+        }
+
+        if (facultyPatch.isAddressUpdated()) {
+            assignments.add("address = :address");
+            parameters.addValue("address", facultyPatch.getAddress());
+        }
+
+        if (facultyPatch.isInfoUpdated()) {
+            assignments.add("info = :info");
+            parameters.addValue("info", facultyPatch.getInfo());
+        }
+
+        String assigmentStr = String.join(", ", assignments);
+        String query = String.format(PATCH_FACULTY_BY_ID_QUERY_TEMPLATE, assigmentStr);
+
+        int affectedRows;
+        try {
+            affectedRows = jdbcTemplate.update(query, parameters);
+        } catch (DuplicateKeyException e) {
+            if (e.getCause().getMessage().contains("duplicate key value violates unique constraint \"faculties_name_key\"")) {
+                throw new DataConflictException(String.format("Faculty with name \"%s\" already exists!", facultyPatch.getName()));
+            }
+
+            throw e;
+        }
+
+        if (affectedRows == 0) {
+            throw new NotFoundException("Faculty with id " + id + " not found!");
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        int affectedRows = jdbcTemplate.update(DELETE_FACULTY_BY_ID_QUERY, new MapSqlParameterSource("id", id));
+
+        if (affectedRows == 0) {
             throw new NotFoundException("Faculty with id " + id + " not found!");
         }
     }

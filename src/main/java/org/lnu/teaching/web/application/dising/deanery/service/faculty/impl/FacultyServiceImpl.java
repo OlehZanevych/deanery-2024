@@ -3,7 +3,9 @@ package org.lnu.teaching.web.application.dising.deanery.service.faculty.impl;
 import lombok.AllArgsConstructor;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.BaseFacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyDto;
+import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyPatch;
 import org.lnu.teaching.web.application.dising.deanery.entity.faculty.FacultyEntity;
+import org.lnu.teaching.web.application.dising.deanery.exception.BadRequestException;
 import org.lnu.teaching.web.application.dising.deanery.mapper.FacultyMapper;
 import org.lnu.teaching.web.application.dising.deanery.repository.faculty.FacultyRepository;
 import org.lnu.teaching.web.application.dising.deanery.service.faculty.FacultyService;
@@ -35,5 +37,27 @@ public class FacultyServiceImpl implements FacultyService {
     public FacultyDto find(Long id) {
         FacultyEntity facultyEntity = facultyRepository.find(id);
         return facultyMapper.toDto(facultyEntity);
+    }
+
+    @Override
+    public void update(Long id, BaseFacultyDto facultyDto) {
+        FacultyEntity facultyEntity = facultyMapper.toEntity(facultyDto);
+        facultyEntity.setId(id);
+
+        facultyRepository.update(facultyEntity);
+    }
+
+    @Override
+    public void patch(Long id, FacultyPatch facultyPatch) {
+        if (facultyPatch.isEmpty()) {
+            throw new BadRequestException("Faculty patch is empty!");
+        }
+
+        facultyRepository.patch(id, facultyPatch);
+    }
+
+    @Override
+    public void delete(Long id) {
+        facultyRepository.delete(id);
     }
 }
