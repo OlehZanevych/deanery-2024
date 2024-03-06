@@ -1,9 +1,11 @@
 package org.lnu.teaching.web.application.dising.deanery.service.faculty.impl;
 
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.dto.common.ValueDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.BaseFacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyPatch;
+import org.lnu.teaching.web.application.dising.deanery.dto.faculty.query.params.FacultyFilterOptions;
 import org.lnu.teaching.web.application.dising.deanery.entity.faculty.FacultyEntity;
 import org.lnu.teaching.web.application.dising.deanery.exception.BadRequestException;
 import org.lnu.teaching.web.application.dising.deanery.mapper.FacultyMapper;
@@ -28,9 +30,15 @@ public class FacultyServiceImpl implements FacultyService {
     }
     
     @Override
-    public List<FacultyDto> findAll() {
-        List<FacultyEntity> facultyEntities = facultyRepository.findAll();
+    public List<FacultyDto> findAll(FacultyFilterOptions filterOptions, Integer limit, Integer offset) {
+        List<FacultyEntity> facultyEntities = facultyRepository.findAll(filterOptions, limit, offset);
         return facultyMapper.toDtoList(facultyEntities);
+    }
+
+    @Override
+    public ValueDto<Integer> count(FacultyFilterOptions filterOptions) {
+        int count = facultyRepository.count(filterOptions);
+        return new ValueDto<>(count);
     }
 
     @Override

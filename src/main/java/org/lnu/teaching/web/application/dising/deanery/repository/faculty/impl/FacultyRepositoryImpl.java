@@ -2,6 +2,7 @@ package org.lnu.teaching.web.application.dising.deanery.repository.faculty.impl;
 
 import lombok.AllArgsConstructor;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyPatch;
+import org.lnu.teaching.web.application.dising.deanery.dto.faculty.query.params.FacultyFilterOptions;
 import org.lnu.teaching.web.application.dising.deanery.exception.DataConflictException;
 import org.lnu.teaching.web.application.dising.deanery.exception.NotFoundException;
 import org.lnu.teaching.web.application.dising.deanery.entity.faculty.FacultyEntity;
@@ -51,6 +52,10 @@ public class FacultyRepositoryImpl implements FacultyRepository {
                 address,
                 info
             FROM faculties
+            """;
+
+    private static final String SELECT_FACULTY_COUNT_QUERY = """
+            SELECT COUNT(1) FROM faculties
             """;
 
     private static final String SELECT_FACULTY_BY_ID_QUERY = """
@@ -133,8 +138,37 @@ public class FacultyRepositoryImpl implements FacultyRepository {
     }
 
     @Override
-    public List<FacultyEntity> findAll() {
-        return jdbcTemplate.query(SELECT_FACULTIES_QUERY, FACULTY_ROW_MAPPER);
+    public List<FacultyEntity> findAll(FacultyFilterOptions filterOptions, Integer limit, Integer offset) {
+        StringBuilder queryBuilder = new StringBuilder(SELECT_FACULTIES_QUERY);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+
+        appendConditions(queryBuilder, parameters, filterOptions);
+
+        if (limit != null) {
+            queryBuilder.append(" LIMIT :limit");
+            parameters.addValue("limit", limit);
+        }
+
+        if (offset != null && offset != 0) {
+            queryBuilder.append(" OFFSET :offset");
+            parameters.addValue("offset", offset);
+        }
+
+        String query = queryBuilder.toString();
+
+        return jdbcTemplate.query(query, parameters, FACULTY_ROW_MAPPER);
+    }
+
+    @Override
+    public int count(FacultyFilterOptions filterOptions) {
+        StringBuilder queryBuilder = new StringBuilder(SELECT_FACULTY_COUNT_QUERY);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+
+        appendConditions(queryBuilder, parameters, filterOptions);
+
+        String query = queryBuilder.toString();
+
+        return jdbcTemplate.queryForObject(query, parameters, Integer.class);
     }
 
     @Override
@@ -232,6 +266,29 @@ public class FacultyRepositoryImpl implements FacultyRepository {
 
         if (affectedRows == 0) {
             throw new NotFoundException("Faculty with id " + id + " not found!");
+        }
+    }
+
+    private void appendConditions(StringBuilder queryBuilder, MapSqlParameterSource parameters, FacultyFilterOptions filterOptions) {
+        List<String> conditions = new ArrayList<>();
+
+        String namePararm = filterOptions.getName();
+        if (namePararm != null) {
+            conditions.add("name LIKE(:name)");
+            parameters.addValue("name", "%" + namePararm + "%");
+        }
+
+        String infoPararm = filterOptions.getInfo();
+        if (infoPararm != null) {
+            conditions.add("info LIKE(:info)");
+            parameters.addValue("info", "%" + infoPararm + "%");
+        }
+
+        if (!conditions.isEmpty()) {
+            String conditionStr = String.join(" AND ", conditions);
+
+            queryBuilder.append(" WHERE ");
+            queryBuilder.append(conditionStr);
         }
     }
 }

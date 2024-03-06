@@ -1,9 +1,13 @@
 package org.lnu.teaching.web.application.dising.deanery.controller.facalty;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.dto.common.ValueDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.BaseFacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyPatch;
+import org.lnu.teaching.web.application.dising.deanery.dto.faculty.query.params.FacultyFilterOptions;
 import org.lnu.teaching.web.application.dising.deanery.service.faculty.FacultyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,10 +38,28 @@ public class FacultyController {
     }
 
     @GetMapping
-    public List<FacultyDto> findAll() {
-        return facultyService.findAll();
+    @Operation(
+            parameters = {
+                    @Parameter(name = "name"),
+                    @Parameter(name = "info")
+            }
+    )
+    public List<FacultyDto> findAll(@Parameter(hidden = true) FacultyFilterOptions filterOptions,
+                                    @RequestParam(required = false) Integer limit,
+                                    @RequestParam(required = false) Integer offset)  {
+        return facultyService.findAll(filterOptions, limit, offset);
     }
 
+    @GetMapping("count")
+    @Operation(
+            parameters = {
+                    @Parameter(name = "name"),
+                    @Parameter(name = "info")
+            }
+    )
+    public ValueDto<Integer> count(@Parameter(hidden = true) FacultyFilterOptions filterOptions) {
+        return facultyService.count(filterOptions);
+    }
 
     @GetMapping("{id}")
     public FacultyDto find(@PathVariable Long id) {
