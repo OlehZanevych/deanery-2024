@@ -1,6 +1,7 @@
 package org.lnu.teaching.web.application.dising.deanery.repository.faculty.impl;
 
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.annotation.TrackExecution;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyPatch;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.query.params.FacultyFilterOptions;
 import org.lnu.teaching.web.application.dising.deanery.exception.DataConflictException;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@TrackExecution
 @AllArgsConstructor
 public class FacultyRepositoryImpl implements FacultyRepository {
 

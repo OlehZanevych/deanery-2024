@@ -1,6 +1,7 @@
 package org.lnu.teaching.web.application.dising.deanery.service.faculty.impl;
 
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.annotation.TrackExecution;
 import org.lnu.teaching.web.application.dising.deanery.dto.common.ValueDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.BaseFacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyDto;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@TrackExecution
 @AllArgsConstructor
 public class FacultyServiceImpl implements FacultyService {
     

@@ -1,8 +1,9 @@
-package org.lnu.teaching.web.application.dising.deanery.controller.facalty;
+package org.lnu.teaching.web.application.dising.deanery.controller.faculty;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
+import org.lnu.teaching.web.application.dising.deanery.annotation.TrackExecution;
 import org.lnu.teaching.web.application.dising.deanery.dto.common.ValueDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.BaseFacultyDto;
 import org.lnu.teaching.web.application.dising.deanery.dto.faculty.FacultyDto;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@TrackExecution
 @RestController
 @AllArgsConstructor
 @RequestMapping("faculties")
@@ -45,8 +47,8 @@ public class FacultyController {
             }
     )
     public List<FacultyDto> findAll(@Parameter(hidden = true) FacultyFilterOptions filterOptions,
-                                    @RequestParam(required = false) Integer limit,
-                                    @RequestParam(required = false) Integer offset)  {
+                                    @Parameter(name = "limit") @RequestParam(required = false) Integer limit,
+                                    @Parameter(name = "offset") @RequestParam(required = false) Integer offset)  {
         return facultyService.findAll(filterOptions, limit, offset);
     }
 
@@ -61,6 +63,7 @@ public class FacultyController {
         return facultyService.count(filterOptions);
     }
 
+    @TrackExecution(isEnabled = false)
     @GetMapping("{id}")
     public FacultyDto find(@PathVariable Long id) {
         return facultyService.find(id);
