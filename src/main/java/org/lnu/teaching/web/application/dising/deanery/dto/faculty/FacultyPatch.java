@@ -20,66 +20,67 @@ public class FacultyPatch {
 
     @JsonIgnore
     @Setter(AccessLevel.NONE)
-    private boolean isNameUpdated;
+    private boolean nameUpdated;
 
     @JsonIgnore
     @Setter(AccessLevel.NONE)
-    private boolean isWebsiteUpdated;
+    private boolean websiteUpdated;
 
     @JsonIgnore
     @Setter(AccessLevel.NONE)
-    private boolean isEmailUpdated;
+    private boolean emailUpdated;
 
     @JsonIgnore
     @Setter(AccessLevel.NONE)
-    private boolean isPhoneUpdated;
+    private boolean phoneUpdated;
 
     @JsonIgnore
     @Setter(AccessLevel.NONE)
-    private boolean isAddressUpdated;
+    private boolean addressUpdated;
 
     @JsonIgnore
     @Setter(AccessLevel.NONE)
-    private boolean isInfoUpdated;
+    private boolean infoUpdated;
+
 
     public void setName(String name) {
         empty = false;
-        isNameUpdated = true;
+        nameUpdated = true;
 
         this.name = name;
     }
 
     public void setWebsite(String website) {
         empty = false;
-        isWebsiteUpdated = true;
+        websiteUpdated = true;
 
         this.website = website;
     }
 
     public void setEmail(String email) {
         empty = false;
-        isEmailUpdated = true;
+        emailUpdated = true;
 
         this.email = email;
     }
 
     public void setPhone(String phone) {
         empty = false;
-        isPhoneUpdated = true;
+        phoneUpdated = true;
 
         this.phone = phone;
     }
 
     public void setAddress(String address) {
         empty = false;
-        isAddressUpdated = true;
+        addressUpdated = true;
 
         this.address = address;
     }
 
     public void setInfo(String info) {
         empty = false;
-        isInfoUpdated = true;
+        infoUpdated = true;
 
         this.info = info;
     }
